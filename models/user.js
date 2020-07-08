@@ -27,8 +27,7 @@ const userSchema = mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ["user", "Bootstrap Student", "Immersive Student", "Instructor", "Onboarder"],
-    default: "user"
+    enum: ["user", "Bootstrap Student", "Immersive Student", "Instructor", "Onboarder"]
   },
   creationDate: {
     type: Date,
