@@ -3,7 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const routes = require("../routes");
 const errorHandler = require("../services/errorService");
-
+const appError = require("../utils/appError");
 module.exports = async (app) => {
   app.use(
     cors({
@@ -16,5 +16,11 @@ module.exports = async (app) => {
 
   app.use("/api/user", routes.userRoute);
 
+  // if nothing matches the above routes, then we have to catch it because it's invalid route
+  app.all('*', (req, res, next) => {
+    next(new appError(`Route ${req.originalUrl} is invalid`,'NOT_FOUND', 404));
+  });
+
+  // global error handler middleware
   app.use(errorHandler);
 };

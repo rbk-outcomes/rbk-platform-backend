@@ -1,5 +1,8 @@
-// tell omar to send me this
-module.exports = (error, req, res, next) => {
-  res.status(500).send(error);
-  // fix me
+// when express sees a 4 params in the handler, express well automatically consider this middle is an error handling middleware
+module.exports = ({message = 'error', status = 'ERROR', statusCode = 500}, req, res, next) => {
+  res.status(statusCode).send({
+    status,
+    statusCode,
+    message
+  });
 };

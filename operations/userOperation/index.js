@@ -1,4 +1,5 @@
 const Operation = require("../operation");
+const catchError = require("../../utils/catchError");
 
 class UserOperation extends Operation {
   constructor() {
@@ -41,20 +42,25 @@ class UserOperation extends Operation {
   }
 
   async getAllUsers() {
-    const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = this.outputs;
-    try {
+    return catchError(this, async () => {
       const users = await this.userService.getAllUsers();
-      return this.emit(SUCCESS, { users });
-    } catch (error) {
-      console.log(error);
-      if (error.message === "ValidationError") {
-        return this.emit(VALIDATION_ERROR, error);
-      } else if (error.message === "NotFoundError") {
-        return this.emit(NOT_FOUND, error);
-      } else {
-        return this.emit(ERROR, error);
-      }
-    }
+      return this.emit('SUCCESS', { users });
+    });
+
+    //    const {SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = context.outputs;
+    // try {
+    //      const users = await this.userService.getAllUsers();
+    //       return this.emit(SUCCESS, { users });
+    // } catch (error) {
+    //   console.log(error);
+    //   if (error.message === "ValidationError") {
+    //     return this.emit(VALIDATION_ERROR, error);
+    //   } else if (error.message === "NotFoundError") {
+    //     return this.emit(NOT_FOUND, error);
+    //   } else {
+    //     return this.emit(ERROR, error);
+    //   }
+    // }
   }
 
   async getUserById({ _id }) {
