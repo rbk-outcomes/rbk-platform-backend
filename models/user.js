@@ -35,6 +35,16 @@ const userSchema = mongoose.Schema({
   }
 });
 
+/**
+ * this @function pre invocation hashes the password of every record being saved to the database
+ * @note the second parameter MUST BE a normal ES5 function, in order to set the scope for (this) to points to the respective record
+ */
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = bcrypt.hashSync(this.password, bcrypt.genSaltSync(8));
+  next();
+});
+
 userSchema.methods.generateHash = function (password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
