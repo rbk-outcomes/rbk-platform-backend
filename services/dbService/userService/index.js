@@ -7,6 +7,9 @@ module.exports = new (class UserService {
   async getUserById(_id) {
     return this.user.findOne({ _id });
   }
+  async getUserByEmail(email) {
+    return this.user.findOne({ email });
+  }
   async getAllUsers() {
     return this.user.find();
   }

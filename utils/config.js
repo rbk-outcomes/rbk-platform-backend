@@ -4,7 +4,8 @@ dotenv.config();
 
 module.exports = {
   port: process.env.PORT || 3000,
-  databaseURL: process.env.DATABASE_URI
+  databaseURL: process.env.DATABASE_URI,
+  jwtSecret: process.env.JWT_SECRET
 };
 // cloudinary.config({
 //   cloud_name: process.env.CLOUD_NAME,
