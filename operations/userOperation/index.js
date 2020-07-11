@@ -1,4 +1,8 @@
 const Operation = require("../operation");
+const bcrypt = require("bcrypt-nodejs");
+const jwt = require("jsonwebtoken");
+const { jwtSecret } = require("../../utils/config");
+const ErrorUtil = require("../../utils/ErrorUtil");
 
 class UserOperation extends Operation {
   constructor() {
@@ -9,8 +13,25 @@ class UserOperation extends Operation {
   async login({ email, password }) {
     const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = this.outputs;
     try {
-      // const user = await this.userBdService.
-      return this.emit(SUCCESS, {});
+      let user = await this.userService.getUserByEmail(email);
+      if (!user) {
+        throw ErrorUtil.createNotFoundError({ details: "User not found. Please register" });
+      }
+      let isMatch = bcrypt.compareSync(password, user.password);
+      if (!isMatch) {
+        throw ErrorUtil.createValidationError({ details: "Wrong password" });
+      }
+      let token = jwt.sign(
+        {
+          email: user.email,
+          _id: user._id
+        },
+        jwtSecret,
+        {
+          expiresIn: "1h"
+        }
+      );
+      return this.emit(SUCCESS, { token, user });
     } catch (error) {
       console.log(error);
       if (error.message === "ValidationError") {
@@ -23,11 +44,18 @@ class UserOperation extends Operation {
     }
   }
 
-  async signup({ email, password }) {
+  async signup(payload) {
     const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = this.outputs;
     try {
-      // const user = await this.userBdService.
-      return this.emit(SUCCESS, {});
+      let existingUser = await this.userService.getUserByEmail(payload.email);
+      if (existingUser) {
+        throw ErrorUtil.createValidationError({ details: "User already exists" });
+      }
+      let hashedPassword = bcrypt.hashSync(payload.password, bcrypt.genSaltSync(8), null);
+      payload.password = hashedPassword;
+      let user = await this.userService.addUser(payload);
+
+      return this.emit(SUCCESS, { user });
     } catch (error) {
       console.log(error);
       if (error.message === "ValidationError") {
@@ -60,7 +88,6 @@ class UserOperation extends Operation {
   async getUserById({ _id }) {
     const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = this.outputs;
     try {
-      console.log(_id);
       const user = await this.userService.getUserById(_id);
 
       return this.emit(SUCCESS, { user });

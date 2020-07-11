@@ -5,18 +5,28 @@ module.exports = {
     const userOperation = new UserOperation();
     const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = userOperation.outputs;
 
-    userOperation.on(SUCCESS, callback).on(ERROR, next).on(VALIDATION_ERROR, next).on(NOT_FOUND, next);
+    userOperation
+      .on(SUCCESS, (response) => {
+        res.status(201).send(response);
+      })
+      .on(ERROR, next)
+      .on(VALIDATION_ERROR, next)
+      .on(NOT_FOUND, next);
 
-    // await userOperation.login(req.body);
+    await userOperation.login(req.body);
   },
 
   async signup(req, res, next) {
     const userOperation = new UserOperation();
     const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = userOperation.outputs;
 
-    userOperation.on(SUCCESS, callback).on(ERROR, next).on(VALIDATION_ERROR, next).on(NOT_FOUND, next);
+    userOperation
+      .on(SUCCESS, (user) => res.status(201).send(user))
+      .on(ERROR, next)
+      .on(VALIDATION_ERROR, next)
+      .on(NOT_FOUND, next);
 
-    // await userOperation.signup(req.body);
+    await userOperation.signup(req.body);
   },
 
   async getAllUsers(req, res, next) {
