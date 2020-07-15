@@ -6,7 +6,7 @@ module.exports = {
     const { SUCCESS, ERROR, VALIDATION_ERROR, NOT_FOUND } = userOperation.outputs;
 
     userOperation.
-    on(SUCCESS, (token) => res.status(200).send(token)).
+    on(SUCCESS, token => res.status(200).send(token)).
     on(ERROR, next).
     on(VALIDATION_ERROR, next).
     on(NOT_FOUND, next);
